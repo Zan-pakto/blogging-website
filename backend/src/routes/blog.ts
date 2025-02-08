@@ -3,7 +3,8 @@ import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { sign, verify } from "hono/jwt";
 import { any } from "zod";
-import { signupInput } from "../../../common/src/zod";
+import { createblogInput } from "../../../common/src/zod";
+
 export const blogRouter = new Hono<{
   Bindings: {
     DATABASE_URL: string;
@@ -32,11 +33,12 @@ blogRouter.post("/", async (c) => {
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
   const body = await c.req.json();
-  const parseInput = signupInput.safeParse(body);
-  if (!parseInput.success) {
-    c.status(403);
+  const parseBody = createblogInput.safeParse(body);
+  if (parseBody.success) {
+    c.status(411);
     return c.text("wrong inputs");
   }
+
   const blog = await prisma.blog.create({
     data: {
       title: body.title,
