@@ -33,11 +33,11 @@ blogRouter.post("/", async (c) => {
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
   const body = await c.req.json();
-  const parseBody = createblogInput.safeParse(body);
-  if (parseBody.success) {
-    c.status(411);
-    return c.text("wrong inputs");
-  }
+  //   const parseBody = createblogInput.safeParse(body);
+  //   if (parseBody.success) {
+  //     c.status(411);
+  //     return c.text("wrong inputs");
+  //   }no
 
   const blog = await prisma.blog.create({
     data: {
