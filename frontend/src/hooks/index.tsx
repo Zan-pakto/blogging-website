@@ -10,47 +10,56 @@ export interface Blog {
   };
 }
 
+const API_BASE_URL = "https://backend.arvindshahi444.workers.dev/api/v1/blog";
+
+const getAuthHeaders = () => ({
+  Authorization: localStorage.getItem("token") || "",
+});
+
 export const useBlog = ({ id }: { id: string }) => {
   const [loading, setLoading] = useState(true);
-  const [blog, setBlog] = useState<Blog>();
+  const [blog, setBlog] = useState<Blog | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    setLoading(true);
+    setError(null);
+
     axios
-      .get(`https://backend.arvindshahi444.workers.dev/api/v1/blog/:${id}`, {
-        headers: {
-          Authorization: localStorage.getItem("token"),
-        },
-      })
+      .get(`${API_BASE_URL}/${id}`, { headers: getAuthHeaders() })
       .then((response) => {
         setBlog(response.data.blog);
-        setLoading(false);
-      });
+      })
+      .catch((err) => {
+        console.error("Error fetching blog:", err);
+        setError("Failed to load blog.");
+      })
+      .finally(() => setLoading(false));
   }, [id]);
 
-  return {
-    loading,
-    blog,
-  };
+  return { loading, blog, error };
 };
+
 export const useBlogs = () => {
   const [loading, setLoading] = useState(true);
   const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    setLoading(true);
+    setError(null);
+
     axios
-      .get(`https://backend.arvindshahi444.workers.dev/api/v1/blog/bulk`, {
-        headers: {
-          Authorization: localStorage.getItem("token"),
-        },
-      })
+      .get(`${API_BASE_URL}/bulk`, { headers: getAuthHeaders() })
       .then((response) => {
         setBlogs(response.data.blogs);
-        setLoading(false);
-      });
+      })
+      .catch((err) => {
+        console.error("Error fetching blogs:", err);
+        setError("Failed to load blogs.");
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  return {
-    loading,
-    blogs,
-  };
+  return { loading, blogs, error };
 };
